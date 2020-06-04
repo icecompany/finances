@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form addrulepath="/administrator/components/com_finances/models/rules">
+    <fieldset name="general">
+        <field
+                name="dat"
+                type="calendar"
+                label="COM_FINANCES_FORM_DATE"
+                description="COM_FINANCES_FORM_PAYMENT_DATE_DESC"
+                filter="none"
+                class="span12"
+                format="%d.%m.%Y"
+                required="true"
+        />
+        <field
+                name="order_name"
+                type="text"
+                label="COM_FINANCES_FORM_PAYMENT_ORDER_NAME_LABEL"
+                description="COM_FINANCES_FORM_PAYMENT_ORDER_NAME_DESC"
+                hint="COM_FINANCES_FORM_PAYMENT_ORDER_NAME_HINT"
+                autocomplete="off"
+                maxlength="255"
+                class="span12"
+        />
+        <field
+                name="amount"
+                type="text"
+                label="COM_FINANCES_FORM_PAYMENT_AMOUNT_LABEL"
+                description="COM_FINANCES_FORM_PAYMENT_AMOUNT_DESC"
+                hint="100.00"
+                message="COM_FINANCES_FORM_PAYMENT_AMOUNT_MESSAGE"
+                required="true"
+                autocomplete="off"
+                validate="Amount"
+                maxlength="13"
+                class="span12"
+        />
+        <field
+                name="payerID"
+                type="Payer"
+                label="COM_FINANCES_FORM_PAYER_LABEL"
+                description="COM_FINANCES_FORM_PAYER_DESC"
+                class="span12"
+                >
+            <option value="">COM_FINANCES_FILTER_SELECT_PAYER</option>
+        </field>
+        <field
+                name="id"
+                type="hidden"
+        />
+        <field
+                name="scoreID"
+                type="hidden"
+        />
+    </fieldset>
+</form>

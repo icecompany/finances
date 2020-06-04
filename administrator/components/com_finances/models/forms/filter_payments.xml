@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form>
+	<fields name="filter">
+		<field
+				name="search"
+				type="text"
+				hint="COM_MKV_FILTER_COMPANY"
+				autocomplete="off"
+				class="js-stools-search-string"
+		/>
+		<field
+				name="manager"
+				type="Manager"
+				onchange="this.form.submit();"
+				>
+			<option value="">COM_MKV_FILTER_SELECT_MANAGER</option>
+		</field>
+	</fields>
+	<fields name="list">
+		<field
+				name="limit"
+				type="limitbox"
+				class="input-mini advancedSelect"
+				default="25"
+				onchange="this.form.submit();"
+		/>
+		<field
+				name="fullordering"
+				type="hidden"
+		/>
+	</fields>
+</form>

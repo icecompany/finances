@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<metadata>
+    <layout title="COM_FINANCES_MENU_PAYMENTS">
+        <message>
+            <![CDATA[COM_FINANCES_MENU_PAYMENTS_DESC]]>
+		</message>
+    </layout>
+</metadata>
