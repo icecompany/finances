@@ -26,6 +26,29 @@ class FinancesHelper
         }
 	}
 
+    public static function getActionUrl(): string
+    {
+        $uri = JUri::getInstance();
+        $uri->setVar('refresh', '1');
+        $input = JFactory::getApplication()->input;
+        $view = $input->getString('view');
+        $contractID = $input->getInt('contractID', 0);
+        $scoreID = $input->getInt('scoreID', 0);
+        if (($view === 'scores' && $contractID > 0) || ($view === 'payments' && $scoreID > 0)) {
+            $uri->setVar('return', self::getReturnUrl());
+        }
+        $query = $uri->getQuery();
+        $client = (!JFactory::getApplication()->isClient('administrator')) ? 'site' : 'administrator';
+        return JRoute::link($client, "index.php?{$query}");
+    }
+
+    public static function getReturnUrl(): string
+    {
+        $uri = JUri::getInstance();
+        $query = $uri->getQuery();
+        return base64_encode("index.php?{$query}");
+    }
+
     public static function canDo(string $action): bool
     {
         return JFactory::getUser()->authorise($action, 'com_finances');

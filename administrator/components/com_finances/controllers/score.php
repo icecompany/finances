@@ -10,15 +10,15 @@ class FinancesControllerScore extends FormController {
         $referer = JUri::getInstance($_SERVER['HTTP_REFERER']);
         if ($referer->getVar('view') === 'contract') {
             $contractID = $referer->getVar('id');
-            $this->input->set('return', base64_encode($_SERVER['HTTP_REFERER']));
+            $this->input->set('return', base64_encode(base64_encode($referer->toString())));
         }
         if ($referer->getVar('view') === 'scores') {
             $contractID = $referer->getVar('contractID');
-            $this->input->set('return', base64_encode($referer->getVar('return')));
+            $this->input->set('return', base64_encode($referer->toString()));
         }
         if ($referer->getVar('view') === 'contracts') {
             $contractID = $uri->getVar('contractID');
-            $this->input->set('return', base64_encode($uri->getVar('return')));
+            $this->input->set('return', $uri->getVar('return'));
         }
         if ($contractID > 0) JFactory::getApplication()->setUserState($this->option . '.score.contractID', $contractID);
         return parent::add();

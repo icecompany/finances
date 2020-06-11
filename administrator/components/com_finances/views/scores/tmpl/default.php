@@ -15,7 +15,7 @@ HTMLHelper::_('stylesheet', 'com_scores/style.css', array('version' => 'auto', '
         </form>
     </div>
     <div id="j-main-container" class="span10">
-        <form action="<?php echo PrjHelper::getActionUrl(); ?>" method="post"
+        <form action="<?php echo FinancesHelper::getActionUrl(); ?>" method="post"
               name="adminForm" id="adminForm">
             <?php echo JLayoutHelper::render('joomla.searchtools.default', array('view' => $this)); ?>
             <table class="table table-striped" id="itemList">
