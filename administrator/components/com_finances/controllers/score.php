@@ -10,7 +10,7 @@ class FinancesControllerScore extends FormController {
         $referer = JUri::getInstance($_SERVER['HTTP_REFERER']);
         if ($referer->getVar('view') === 'contract') {
             $contractID = $referer->getVar('id');
-            $this->input->set('return', base64_encode(base64_encode($referer->toString())));
+            $this->input->set('return', $uri->getVar('return'));
         }
         if ($referer->getVar('view') === 'scores') {
             $contractID = $referer->getVar('contractID');
