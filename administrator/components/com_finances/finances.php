@@ -17,8 +17,6 @@ require_once JPATH_COMPONENT_ADMINISTRATOR . '/helpers/finances.php';
 
 //Enable triggers
 $db = JFactory::getDbo();
-$db->setQuery("set @TRIGGER_CHECKS=true")->execute();
-
 
 // Execute the task
 $controller = BaseController::getInstance('finances');
