@@ -74,6 +74,14 @@ class FinancesModelScores extends ListModel
             $orderCol  = $this->state->get('list.ordering');
             $orderDirn = $this->state->get('list.direction');
             $limit = $this->getState('list.limit');
+            if ($orderCol == 's.number') {
+                if ($orderDirn == 'ASC') $orderCol = "LENGTH(s.number) ASC, s.number";
+                if ($orderDirn == 'DESC') $orderCol = "LENGTH(s.number) DESC, s.number";
+            }
+            if ($orderCol == 'contract_number') {
+                if ($orderDirn == 'ASC') $orderCol = "LENGTH(contract_number) ASC, contract_number";
+                if ($orderDirn == 'DESC') $orderCol = "LENGTH(contract_number) DESC, contract_number";
+            }
         }
         else {
             $orderCol  = 's.id';

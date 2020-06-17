@@ -82,6 +82,18 @@ class FinancesModelPayments extends ListModel
             $orderCol  = $this->state->get('list.ordering');
             $orderDirn = $this->state->get('list.direction');
             $limit = $this->getState('list.limit');
+            if ($orderCol == 'p.order_name') {
+                if ($orderDirn == 'ASC') $orderCol = "LENGTH(p.order_name) ASC, p.order_name";
+                if ($orderDirn == 'DESC') $orderCol = "LENGTH(p.order_name) DESC, p.order_name";
+            }
+            if ($orderCol == 's.number') {
+                if ($orderDirn == 'ASC') $orderCol = "LENGTH(s.number) ASC, s.number";
+                if ($orderDirn == 'DESC') $orderCol = "LENGTH(s.number) DESC, s.number";
+            }
+            if ($orderCol == 'contract_number') {
+                if ($orderDirn == 'ASC') $orderCol = "LENGTH(contract_number) ASC, contract_number";
+                if ($orderDirn == 'DESC') $orderCol = "LENGTH(contract_number) DESC, contract_number";
+            }
         }
         else {
             $orderCol  = 's.id';
@@ -113,7 +125,7 @@ class FinancesModelPayments extends ListModel
             $arr['payer'] = $item->payer;
             $arr['payerID'] = $item->payerID;
             $currency = mb_strtoupper($item->currency);
-            $arr['score_date'] = JDate::getInstance($item->score_date)->format("d.m.Y");
+            $arr['score_date'] = JDate::getInstance($item->score_dat)->format("d.m.Y");
             $arr['contract'] = MkvHelper::getContractSmallTitle($item->contract_number ?? '', '');
             $arr['score_status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->score_status}");
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->score_status);
