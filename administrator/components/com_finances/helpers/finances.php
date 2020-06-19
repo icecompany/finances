@@ -53,4 +53,10 @@ class FinancesHelper
     {
         return JFactory::getUser()->authorise($action, 'com_finances');
     }
+
+    public static function getConfig(string $param, $default = null)
+    {
+        $config = JComponentHelper::getParams("com_finances");
+        return $config->get($param, $default);
+    }
 }

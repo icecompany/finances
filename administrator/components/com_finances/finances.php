@@ -13,6 +13,7 @@ JFactory::getLanguage()->load('com_mkv', JPATH_ADMINISTRATOR . "/components/com_
 require_once JPATH_ADMINISTRATOR . "/components/com_mkv/helpers/mkv.php";
 require_once JPATH_ADMINISTRATOR . "/components/com_prj/helpers/prj.php";
 require_once JPATH_ADMINISTRATOR . "/components/com_contracts/helpers/contracts.php";
+require_once JPATH_ADMINISTRATOR . "/components/com_scheduler/helpers/scheduler.php";
 require_once JPATH_COMPONENT_ADMINISTRATOR . '/helpers/finances.php';
 
 //Enable triggers

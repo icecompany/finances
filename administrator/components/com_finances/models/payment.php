@@ -25,7 +25,31 @@ class FinancesModelPayment extends AdminModel {
 
     public function save($data)
     {
+        if ($data['id'] === null) {
+            $score = $this->getScore($data['scoreID']);
+            $contract = $this->getContract($score->contractID);
+            $this->sendNotifyNewPaymentStatus($score->contractID, $contract->company, $contract->managerID, $data['amount'], $contract->currency);
+        }
         return parent::save($data);
+    }
+
+    private function sendNotifyNewPaymentStatus(int $contractID, string $company, $managerID, float $amount, string $currency = 'rub'): void
+    {
+        if (FinancesHelper::getConfig('notify_new_payment_enabled') != '1') return;
+        $currency = mb_strtoupper($currency);
+        $amount = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", number_format((float) $amount, 2, '.', ' '));
+        $data['text'] = JText::sprintf('COM_FINANCES_NOTIFY_NEW_PAYMENT_TEXT', $company, number_format((float) $amount, 2, '.', ' '));
+        $data['contractID'] = $contractID;
+        $data['managerID'] = $managerID;
+        $push = [];
+        $push['id'] = FinancesHelper::getConfig('notify_new_payment_channel_id');
+        $push['key'] = FinancesHelper::getConfig('notify_new_doc_status_channel_key');
+        $push['title'] = JText::sprintf('COM_FINANCES_NOTIFY_NEW_PAYMENT_TITLE', $amount);
+        $push['text'] = $company;
+        $uid = $this->getPushUID($push['id'], $managerID);
+        if ($uid === 0) return;
+        $push['uid'] = $uid;
+        SchedulerHelper::sendNotify($data, $push);
     }
 
     public function getTable($name = 'Payments', $prefix = 'TableFinances', $options = array())
@@ -75,6 +99,14 @@ class FinancesModelPayment extends AdminModel {
         $table->dat = JDate::getInstance($table->dat)->toSql();
 
         parent::prepareTable($table);
+    }
+
+    private function getPushUID(int $channelID, int $managerID): int
+    {
+        JTable::addIncludePath(JPATH_ADMINISTRATOR . "/components/com_scheduler/tables");
+        $table = JTable::getInstance('Channels', 'TableScheduler');
+        $table->load(['channelID' => $channelID, 'managerID' => $managerID]);
+        return $table->uid ?? 0;
     }
 
     private function getScore(int $scoreID)

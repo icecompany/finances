@@ -1,5 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config>
+	<fieldset name="notifies" label="COM_FINANCES_CONFIGURATION_NOTIFIES_LABEL" description="COM_FINANCES_CONFIGURATION_NOTIFIES_DESC">
+		<field name="spacer_1" type="spacer" label="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT" />
+		<field name="notify_new_payment_enabled"
+			   type="radio"
+			   label="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_ENABLED_LABEL"
+			   description="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_ENABLED_DESC"
+			   class="btn-group btn-group-yesno"
+			   default="1"
+			   required="true"
+			   component="com_finances"
+			   section="component"
+		>
+			<option value="0">JNO</option>
+			<option value="1">JYES</option>
+		</field>
+		<field
+				name="notify_new_payment_channel_id"
+				type="text"
+				default="0"
+				filter="integer"
+				label="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_CHANNEL_ID_LABEL"
+				description="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_CHANNEL_ID_DESC"
+				hint="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_CHANNEL_ID_HINT"
+				component="com_contracts"
+				section="component"
+		/>
+		<field
+				name="notify_new_doc_status_channel_key"
+				type="text"
+				label="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_CHANNEL_API_LABEL"
+				description="COM_FINANCES_CONFIGURATION_NOTIFIES_NEW_PAYMENT_CHANNEL_API_DESC"
+				component="com_contracts"
+				section="component"
+		/>
+	</fieldset>
 	<fieldset name="permissions" label="JCONFIG_PERMISSIONS_LABEL" description="JCONFIG_PERMISSIONS_DESC">
 		<field name="rules"
 			   type="rules"
