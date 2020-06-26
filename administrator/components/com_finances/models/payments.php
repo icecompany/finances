@@ -66,8 +66,20 @@ class FinancesModelPayments extends ListModel
             /* Фильтр */
             $search = $this->getState('filter.search');
             if (!empty($search)) {
-                $text = $this->_db->q("%{$search}%");
-                $query->where("e.title like {$text}");
+                if (stripos($search, 'num:') !== false || stripos($search, '#') !== false || stripos($search, '№') !== false) { //Поиск по номеру договора
+                    $delimiter = ":";
+                    if (stripos($search, 'num:') !== false) $delimiter = ":";
+                    if (stripos($search, '#') !== false) $delimiter = "#";
+                    if (stripos($search, '№') !== false) $delimiter = "№";
+                    $num = explode($delimiter, $search);
+                    $num = $num[1];
+                    if (is_numeric($num)) {
+                        $query->where("c.number = {$this->_db->q($num)}");
+                    }
+                } else {
+                    $text = $this->_db->q("%{$search}%");
+                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text} e1.title like {$text} or e1.title_full like {$text} or e1.title_en like {$text})");
+                }
             }
             // Фильтруем по менеджеру.
             $manager = $this->getState('filter.manager');
@@ -109,7 +121,7 @@ class FinancesModelPayments extends ListModel
     public function getItems()
     {
         $items = parent::getItems();
-        $result = ['items' => [], 'stands' => []];
+        $result = ['items' => [], 'stands' => [], 'amount'];
         $return = PrjHelper::getReturnUrl();
         $cid = [];
         foreach ($items as $item)
@@ -149,7 +161,10 @@ class FinancesModelPayments extends ListModel
             $arr['score_link'] = JHtml::link($url, $arr['score_number']);
             $result['items'][] = $arr;
         }
+        $project = PrjHelper::getActiveProject();
+        if (is_numeric($project) && ContractsHelper::canDo('core.project.amount')) $result['amount'] = ContractsHelper::getProjectAmount((int) $project);
         $result['stands'] = $this->getStands($cid);
+
         return $result;
     }
 

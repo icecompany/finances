@@ -6,7 +6,7 @@ defined('_JEXEC') or die;
 class FinancesViewPayments extends HtmlView
 {
     protected $sidebar = '';
-    public $items, $pagination, $uid, $state, $filterForm, $activeFilters, $scoreID;
+    public $items, $pagination, $uid, $state, $filterForm, $activeFilters, $scoreID, $activeProject;
 
     public function display($tpl = null)
     {
@@ -16,6 +16,7 @@ class FinancesViewPayments extends HtmlView
         $this->filterForm = $this->get('FilterForm');
         $this->activeFilters = $this->get('ActiveFilters');
         $this->scoreID = $this->get('ScoreID');
+        $this->activeProject = PrjHelper::getActiveProject();
 
         $this->filterForm->addFieldPath(JPATH_ADMINISTRATOR . "/components/com_mkv/models/fields");
 

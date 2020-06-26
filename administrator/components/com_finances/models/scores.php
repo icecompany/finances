@@ -53,8 +53,20 @@ class FinancesModelScores extends ListModel
             /* Фильтр */
             $search = $this->getState('filter.search');
             if (!empty($search)) {
-                $text = $this->_db->q("%{$search}%");
-                $query->where("e.title like {$text}");
+                if (stripos($search, 'num:') !== false || stripos($search, '#') !== false || stripos($search, '№') !== false) { //Поиск по номеру договора
+                    $delimiter = ":";
+                    if (stripos($search, 'num:') !== false) $delimiter = ":";
+                    if (stripos($search, '#') !== false) $delimiter = "#";
+                    if (stripos($search, '№') !== false) $delimiter = "№";
+                    $num = explode($delimiter, $search);
+                    $num = $num[1];
+                    if (is_numeric($num)) {
+                        $query->where("c.number = {$this->_db->q($num)}");
+                    }
+                } else {
+                    $text = $this->_db->q("%{$search}%");
+                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text})");
+                }
             }
             // Фильтруем по состоянию оплаты.
             $status = $this->getState('filter.status');
