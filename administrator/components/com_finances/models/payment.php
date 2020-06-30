@@ -38,7 +38,7 @@ class FinancesModelPayment extends AdminModel {
         if (FinancesHelper::getConfig('notify_new_payment_enabled') != '1') return;
         $currency = mb_strtoupper($currency);
         $amount = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", number_format((float) $amount, 2, '.', ' '));
-        $data['text'] = JText::sprintf('COM_FINANCES_NOTIFY_NEW_PAYMENT_TEXT', $company, number_format((float) $amount, 2, '.', ' '));
+        $data['text'] = JText::sprintf('COM_FINANCES_NOTIFY_NEW_PAYMENT_TEXT', $company, $amount);
         $data['contractID'] = $contractID;
         $data['managerID'] = $managerID;
         $push = [];
