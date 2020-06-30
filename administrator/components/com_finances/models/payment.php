@@ -47,9 +47,13 @@ class FinancesModelPayment extends AdminModel {
         $push['title'] = JText::sprintf('COM_FINANCES_NOTIFY_NEW_PAYMENT_TITLE', $amount);
         $push['text'] = $company;
         $uid = $this->getPushUID($push['id'], $managerID);
-        if ($uid === 0) return;
-        $push['uid'] = $uid;
-        SchedulerHelper::sendNotify($data, $push);
+        if ($uid !== 0) {
+            $push['uid'] = $uid;
+            SchedulerHelper::sendNotify($data, $push);
+        }
+        else {
+            SchedulerHelper::sendNotify($data);
+        }
     }
 
     public function getTable($name = 'Payments', $prefix = 'TableFinances', $options = array())
