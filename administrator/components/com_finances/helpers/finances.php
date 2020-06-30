@@ -7,6 +7,7 @@ class FinancesHelper
 {
     public static function addSubmenu($vName)
     {
+        PrjHelper::addNotifies();
         HTMLHelper::_('sidebar.addEntry', JText::sprintf('COM_FINANCES_MENU_SCORES'), 'index.php?option=com_finances&view=scores', $vName === 'scores');
         HTMLHelper::_('sidebar.addEntry', JText::sprintf('COM_FINANCES_MENU_PAYMENTS'), 'index.php?option=com_finances&view=payments', $vName === 'payments');
         PrjHelper::addActiveProjectFilter();

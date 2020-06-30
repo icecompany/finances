@@ -78,7 +78,7 @@ class FinancesModelPayments extends ListModel
                     }
                 } else {
                     $text = $this->_db->q("%{$search}%");
-                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text} e1.title like {$text} or e1.title_full like {$text} or e1.title_en like {$text})");
+                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text} or e1.title like {$text} or e1.title_full like {$text} or e1.title_en like {$text})");
                 }
             }
             // Фильтруем по менеджеру.
