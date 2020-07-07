@@ -139,10 +139,8 @@ class FinancesModelScores extends ListModel
             $arr['company_link'] = JHtml::link($url, $item->company);
             $url = JRoute::_("index.php?option=com_contracts&amp;task=contract.edit&amp;id={$item->contractID}&amp;return={$return}");
             $arr['contract_link'] = JHtml::link($url, $arr['contract']);
-            if ($item->status === '0' || $item->status === '2') {
-                $url = JRoute::_("index.php?option={$this->option}&amp;task=payment.add&amp;scoreID={$item->id}&amp;return={$return}");
-                $arr['payment_link'] = JHtml::link($url, JText::sprintf('COM_FINANCES_LINK_ADD_PAYMENT'));
-            }
+            $url = JRoute::_("index.php?option={$this->option}&amp;task=payment.add&amp;scoreID={$item->id}&amp;return={$return}");
+            $arr['payment_link'] = JHtml::link($url, JText::sprintf('COM_FINANCES_LINK_ADD_PAYMENT'));
             if ($item->status === '1' || $item->status === '2') {
                 $url = JRoute::_("index.php?option={$this->option}&amp;view=payments&amp;scoreID={$item->id}");
                 $arr['payments_link'] = JHtml::link($url, JText::sprintf('COM_FINANCES_LINK_PAYMENTS'));
