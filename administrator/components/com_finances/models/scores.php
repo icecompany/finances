@@ -65,7 +65,7 @@ class FinancesModelScores extends ListModel
                     }
                 } else {
                     $text = $this->_db->q("%{$search}%");
-                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text})");
+                    $query->where("(e.title like {$text} or e.title_full like {$text} or e.title_en like {$text} or s.number like {$text})");
                 }
             }
             // Фильтруем по состоянию оплаты.
