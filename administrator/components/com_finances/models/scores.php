@@ -122,13 +122,13 @@ class FinancesModelScores extends ListModel
             $arr['contract_date'] = JDate::getInstance($item->contract_date)->format("d.m.Y");
             $currency = mb_strtoupper($item->currency);
             $arr['amount_clean'] = $item->amount;
-            $amount = number_format((float) $item->amount, 2, '.', ' ');
+            $amount = number_format((float) $item->amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $amount);
             $arr['payments_clean'] = $item->payments;
-            $payments = number_format((float) $item->payments, 2, '.', ' ');
+            $payments = number_format((float) $item->payments, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['payments'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $payments);
             $arr['debt_clean'] = $item->debt;
-            $debt = number_format((float) $item->debt, 2, '.', ' ');
+            $debt = number_format((float) $item->debt, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['debt'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $debt);
             $arr['status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->status}");
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->status);

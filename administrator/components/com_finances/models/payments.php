@@ -142,12 +142,12 @@ class FinancesModelPayments extends ListModel
             $arr['score_status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->score_status}");
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->score_status);
             $arr['score_status'] = "<span style='color: {$arr['color']}'>{$arr['score_status_clean']}</span>";
-            $score_amount = number_format((float) $item->score_amount, 2, '.', ' ');
+            $score_amount = number_format((float) $item->score_amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['score_amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $score_amount);
             $arr['dat'] = JDate::getInstance($item->dat)->format("d.m.Y");
             $arr['contract_date'] = JDate::getInstance($item->contract_date)->format("d.m.Y");
             $arr['amount_clean'] = $item->amount;
-            $amount = number_format((float) $item->amount, 2, '.', ' ');
+            $amount = number_format((float) $item->amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $amount);
             $url = JRoute::_("index.php?option={$this->option}&amp;task=payment.edit&amp;id={$item->id}&amp;return={$return}");
             $arr['edit_link'] = JHtml::link($url, $item->order_name);
