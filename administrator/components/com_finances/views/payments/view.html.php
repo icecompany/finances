@@ -51,6 +51,7 @@ class FinancesViewPayments extends HtmlView
         {
             JToolbarHelper::deleteList('COM_FINANCES_CONFIRM_REMOVE_PAYMENT', 'payments.delete');
         }
+        JToolbarHelper::custom('payments.download', 'download', 'download', JText::sprintf('COM_MKV_BUTTON_EXPORT_TO_EXCEL'), false);
 
         if (FinancesHelper::canDo('core.admin'))
         {

@@ -39,6 +39,19 @@ class FinancesModelPayments extends ListModel
             $this->contractID = $config['contractID'];
             $this->raw = true;
         }
+        $this->export = ($input->getString('format', 'html') !== 'html');
+        $this->heads = [
+            'stands' => 'COM_MKV_HEAD_STANDS',
+            'order_name' => 'COM_MKV_HEAD_PAYMENT_ORDER',
+            'dat' => 'COM_MKV_HEAD_PAYMENT_DATE',
+            'amount_export' => 'COM_MKV_HEAD_AMOUNT',
+            'score_number' => 'COM_MKV_HEAD_SCORE_NUMBER',
+            'score_date' => 'COM_MKV_HEAD_SCORE_DATE',
+            'contract_number_clean' => 'COM_MKV_HEAD_CONTRACT_NUMBER',
+            'contract_date' => 'COM_MKV_HEAD_CONTRACT_DATE',
+            'company' => 'COM_MKV_HEAD_COMPANY',
+            'manager' => 'COM_MKV_HEAD_MANAGER',
+        ];
     }
 
     protected function _getListQuery()
@@ -56,6 +69,11 @@ class FinancesModelPayments extends ListModel
             ->leftJoin("#__mkv_contracts c on c.id = s.contractID")
             ->leftJoin("#__mkv_companies e on e.id = c.companyID")
             ->leftJoin("#__mkv_companies e1 on e1.id = p.payerID");
+        if ($this->export) {
+            $query
+                ->select("u.name as manager")
+                ->leftJoin("#__users u on u.id = c.managerID");
+        }
         if (is_numeric($this->scoreID)) {
             $query->where("p.scoreID = {$this->_db->q($this->scoreID)}");
         }
@@ -112,6 +130,7 @@ class FinancesModelPayments extends ListModel
             $orderDirn = 'desc';
             $limit = 0;
         }
+        if ($this->export) $limit = 0;
         $query->order($this->_db->escape($orderCol . ' ' . $orderDirn));
         $this->setState('list.limit', $limit);
 
@@ -139,6 +158,7 @@ class FinancesModelPayments extends ListModel
             $currency = mb_strtoupper($item->currency);
             $arr['score_date'] = JDate::getInstance($item->score_dat)->format("d.m.Y");
             $arr['contract'] = MkvHelper::getContractSmallTitle($item->contract_number ?? '', '');
+            $arr['contract_number_clean'] = $item->contract_number;
             $arr['score_status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->score_status}");
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->score_status);
             $arr['score_status'] = "<span style='color: {$arr['color']}'>{$arr['score_status_clean']}</span>";
@@ -147,6 +167,7 @@ class FinancesModelPayments extends ListModel
             $arr['dat'] = JDate::getInstance($item->dat)->format("d.m.Y");
             $arr['contract_date'] = JDate::getInstance($item->contract_date)->format("d.m.Y");
             $arr['amount_clean'] = $item->amount;
+            $arr['amount_export'] = number_format((float) $item->amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, '');
             $amount = number_format((float) $item->amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $amount);
             $url = JRoute::_("index.php?option={$this->option}&amp;task=payment.edit&amp;id={$item->id}&amp;return={$return}");
@@ -159,6 +180,7 @@ class FinancesModelPayments extends ListModel
             $arr['contract_link'] = JHtml::link($url, $arr['contract']);
             $url = JRoute::_("index.php?option={$this->option}&amp;task=score.edit&amp;id={$item->scoreID}&amp;return={$return}");
             $arr['score_link'] = JHtml::link($url, $arr['score_number']);
+            if ($this->export) $arr['manager'] = MkvHelper::getLastAndFirstNames($item->manager);
             $result['items'][] = $arr;
         }
         $project = PrjHelper::getActiveProject();
@@ -166,6 +188,53 @@ class FinancesModelPayments extends ListModel
         $result['stands'] = $this->getStands($cid);
 
         return $result;
+    }
+
+    public function export()
+    {
+        $items = $this->getItems();
+        JLoader::discover('PHPExcel', JPATH_LIBRARIES);
+        JLoader::register('PHPExcel', JPATH_LIBRARIES . '/PHPExcel.php');
+
+        $xls = new PHPExcel();
+        $xls->setActiveSheetIndex(0);
+        $sheet = $xls->getActiveSheet();
+
+        //Ширина столбцов
+        $width = ["A" => 19, "B" => 8, "C" => 14, "D" => 12, "E" => 13, "F" => 11, "G" => 13, "H" => 15, "I" => 72, "J" => 20];
+        foreach ($width as $col => $value) $sheet->getColumnDimension($col)->setWidth($value);
+
+        //Заголовки
+        $j = 0;
+        foreach ($this->heads as $item => $head) $sheet->setCellValueByColumnAndRow($j++, 1, JText::sprintf($head));
+
+        $sheet->setTitle(JText::sprintf('COM_FINANCES_MENU_PAYMENTS'));
+
+        //Данные
+        $row = 2; //Строка, с которой начнаются данные
+        foreach ($items['items'] as $item) {
+            $col = 0;
+            foreach ($this->heads as $elem => $head) {
+                if ($col === 0) {
+                    $sheet->setCellValue("A{$row}", $items['stands'][$item['contractID']]);
+                }
+                else {
+                    $sheet->setCellValueByColumnAndRow($col, $row, $item[$elem]);
+                    $sheet->getStyleByColumnAndRow($col, $row)->getNumberFormat()->setFormatCode('0');
+                }
+                $col++;
+            }
+            $row++;
+        }
+        header("Expires: Mon, 1 Apr 1974 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Pragma: public");
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=Payments.xls");
+        $objWriter = PHPExcel_IOFactory::createWriter($xls, 'Excel5');
+        $objWriter->save('php://output');
+        jexit();
     }
 
     public function getTitle(): string
@@ -209,9 +278,9 @@ class FinancesModelPayments extends ListModel
         $result = [];
         $tmp = [];
         foreach ($items as $contractID => $data) {
-            foreach ($data as $item) $tmp[$contractID][] = $item['edit_link'];
+            foreach ($data as $item) $tmp[$contractID][] = (!$this->export) ? $item['edit_link'] : $item['number'];
         }
-        foreach ($tmp as $contractID => $stand) $result[$contractID] = implode('<br>', $stand);
+        foreach ($tmp as $contractID => $stand) $result[$contractID] = implode((!$this->export) ? '<br>' : ', ', $stand);
         return $result;
     }
 
@@ -230,5 +299,5 @@ class FinancesModelPayments extends ListModel
         return parent::getStoreId($id);
     }
 
-    private $scoreID, $raw, $contractID;
+    private $scoreID, $raw, $contractID, $heads, $export;
 }

@@ -15,4 +15,11 @@ class FinancesControllerPayments extends AdminController
     {
         return parent::getModel($name, $prefix, array('ignore_request' => true));
     }
+
+    public function download(): void
+    {
+        echo "<script>window.open('index.php?option=com_finances&task=payments.execute&format=xls');</script>";
+        echo "<script>location.href='{$_SERVER['HTTP_REFERER']}'</script>";
+        jexit();
+    }
 }
