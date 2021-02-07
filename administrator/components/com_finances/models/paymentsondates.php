@@ -45,10 +45,21 @@ class FinancesModelPaymentsOnDates extends ListModel
         $result = [];
         foreach ($items as $item)
         {
+            if (!isset($result[$item->managerID])) {
+                foreach (['current', 'week', 'dynamic'] as $period) {
+                    foreach (['rub', 'usd', 'eur'] as $currency) {
+                        $result[$item->managerID][$period][$currency] = (float) 0;
+                    }
+                }
+            }
             $result[$item->managerID][$item->period][$item->currency] = (float) $item->payments;
             foreach (['rub', 'usd', 'eur'] as $currency) {
                 $result[$item->managerID]['dynamic'][$currency] = (float) $result[$item->managerID]['current'][$currency];
-                $result[$item->managerID]['current'][$currency] = (float) $result[$item->managerID]['current'][$currency] + (float) $result[$item->managerID]['week'][$currency];
+            }
+        }
+        foreach ($result as $managerID => $data) {
+            foreach (['rub', 'usd', 'eur'] as $currency) {
+                $result[$managerID]['current'][$currency] = (float) $data['week'][$currency] + (float) $data['dynamic'][$currency];
             }
         }
 
