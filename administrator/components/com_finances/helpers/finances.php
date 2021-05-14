@@ -12,16 +12,17 @@ class FinancesHelper
         HTMLHelper::_('sidebar.addEntry', JText::sprintf('COM_FINANCES_MENU_PAYMENTS'), 'index.php?option=com_finances&view=payments', $vName === 'payments');
         PrjHelper::addActiveProjectFilter();
     }
-    public static function getPaymentStatusColor(int $status)
+    public static function getPaymentStatusColor($status)
     {
         switch ($status) {
+            case null: {
+                return 'orange';
+            }
             case 0: {
                 return 'red';
-                break;
             }
             case 1: {
                 return 'green';
-                break;
             }
             default: return 'blue';
         }

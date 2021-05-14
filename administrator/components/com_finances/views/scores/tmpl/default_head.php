@@ -26,7 +26,10 @@ $listDirn    = $this->escape($this->state->get('list.direction'));
         <?php echo JHtml::_('searchtools.sort', 'COM_MKV_HEAD_COMPANY', 'e.title', $listDirn, $listOrder); ?>
     </th>
     <th>
-        <?php echo JHtml::_('searchtools.sort', 'COM_MKV_HEAD_AMOUNT', 's.amount', $listDirn, $listOrder); ?>
+        <?php echo JHtml::_('searchtools.sort', 'COM_MKV_HEAD_CONTRACT_AMOUNT', 'c.amount', $listDirn, $listOrder); ?>
+    </th>
+    <th>
+        <?php echo JHtml::_('searchtools.sort', 'COM_MKV_HEAD_PAYMENT_AMOUNT', 's.amount', $listDirn, $listOrder); ?>
     </th>
     <th>
         <?php echo JHtml::_('searchtools.sort', 'COM_MKV_HEAD_PAYED', 's.payments', $listDirn, $listOrder); ?>

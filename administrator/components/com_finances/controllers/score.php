@@ -13,7 +13,7 @@ class FinancesControllerScore extends FormController {
             $this->input->set('return', $uri->getVar('return'));
         }
         if ($referer->getVar('view') === 'scores') {
-            $contractID = $referer->getVar('contractID');
+            $contractID = $referer->getVar('contractID') ?? JFactory::getApplication()->input->getInt('contractID');
             $this->input->set('return', base64_encode($referer->toString()));
         }
         if ($referer->getVar('view') === 'contracts') {

@@ -27,6 +27,9 @@ foreach ($this->items['items'] as $i => $item) :
             <?php echo $item['company_link']; ?>
         </td>
         <td>
+            <?php echo $item['contract_amount']; ?>
+        </td>
+        <td>
             <?php echo $item['amount']; ?>
         </td>
         <td>

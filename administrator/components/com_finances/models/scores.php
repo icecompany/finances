@@ -12,6 +12,7 @@ class FinancesModelScores extends ListModel
                 's.dat',
                 's.number',
                 'contract_number',
+                'c.amount',
                 's.amount',
                 's.status',
                 'status',
@@ -42,10 +43,11 @@ class FinancesModelScores extends ListModel
             ->select("e.title as company")
             ->select("s.*")
             ->select("ifnull(c.number_free, c.number) as contract_number, c.dat as contract_date")
-            ->select("c.currency, c.companyID")
+            ->select("c.amount as contract_amount, c.currency, c.companyID, c.id as contractID")
             ->from("#__mkv_scores s")
-            ->leftJoin("#__mkv_contracts c on c.id = s.contractID")
-            ->leftJoin("#__mkv_companies e on e.id = c.companyID");
+            ->rightJoin("#__mkv_contracts c on c.id = s.contractID")
+            ->leftJoin("#__mkv_companies e on e.id = c.companyID")
+            ->where("c.status in (1, 5, 10)");
         if (is_numeric($this->contractID)) {
             $query->where("s.contractID = {$this->_db->q($this->contractID)}");
         }
@@ -131,6 +133,9 @@ class FinancesModelScores extends ListModel
             $debt = number_format((float) $item->debt, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['debt'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $debt);
             $arr['status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->status}");
+            $contract_amount = (!is_null($item->contract_amount)) ? number_format((float) $item->contract_amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC) : '';
+            $arr['contract_amount_clean'] = $contract_amount;
+            $arr['contract_amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $contract_amount);
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->status);
             $arr['status'] = "<span style='color: {$arr['color']}'>{$arr['status_clean']}</span>";
             $url = JRoute::_("index.php?option={$this->option}&amp;task=score.edit&amp;id={$item->id}&amp;return={$return}");
@@ -144,6 +149,10 @@ class FinancesModelScores extends ListModel
             if ($item->status === '1' || $item->status === '2') {
                 $url = JRoute::_("index.php?option={$this->option}&amp;view=payments&amp;scoreID={$item->id}");
                 $arr['payments_link'] = JHtml::link($url, JText::sprintf('COM_FINANCES_LINK_PAYMENTS'));
+            }
+            if (is_null($item->status)) {
+                $url = JRoute::_("index.php?option={$this->option}&amp;task=score.add&amp;contractID={$item->contractID}&amp;return={$return}");
+                $arr['payment_link'] = JHtml::link($url, JText::sprintf('COM_MKV_BUTTON_ADD_SCORE'));
             }
             $result['items'][] = $arr;
         }
