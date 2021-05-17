@@ -47,7 +47,8 @@ class FinancesModelScores extends ListModel
             ->from("#__mkv_scores s")
             ->rightJoin("#__mkv_contracts c on c.id = s.contractID")
             ->leftJoin("#__mkv_companies e on e.id = c.companyID")
-            ->where("c.status in (1, 5, 10)");
+            ->where("c.status in (1, 5, 10)")
+            ->group("s.contractID");
         if (is_numeric($this->contractID)) {
             $query->where("s.contractID = {$this->_db->q($this->contractID)}");
         }
@@ -111,7 +112,7 @@ class FinancesModelScores extends ListModel
     public function getItems()
     {
         $items = parent::getItems();
-        $result = ['items' => []];
+        $result = ['items' => [], 'amount' => [], 'contracts_amount' => []];
         $return = PrjHelper::getReturnUrl();
         foreach ($items as $item)
         {
@@ -156,6 +157,8 @@ class FinancesModelScores extends ListModel
             }
             $result['items'][] = $arr;
         }
+        $result['amount'] = FinancesHelper::getProjectScoresAmount();
+        $result['contracts_amount'] = ContractsHelper::getProjectAmount();
         return $result;
     }
 

@@ -28,6 +28,29 @@ class FinancesHelper
         }
 	}
 
+    public static function getProjectScoresAmount(): array
+    {
+        $result = ['rub' => 0, 'usd' => 0, 'eur' => 0];
+        $db = JFactory::getDbo();
+        $query = $db->getQuery(true);
+        $query
+            ->select("c.currency, sum(sc.amount) as amount")
+            ->from("#__mkv_scores sc")
+            ->leftJoin("#__mkv_contracts c on sc.contractID = c.id")
+            ->group("c.currency");
+
+        $active_project = PrjHelper::getActiveProject();
+        if (is_numeric($active_project)) $query->where("c.projectID = {$db->q($active_project)}");
+
+        $items = $db->setQuery($query)->loadAssocList();
+        foreach ($items as $item) $result[$item['currency']] = $item['amount'];
+        foreach ($result as $currency => $amount) {
+            $currency_up = mb_strtoupper($currency);
+            $result[$currency] = JText::sprintf("COM_MKV_AMOUNT_{$currency_up}_SHORT", number_format((float) $amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC));
+        }
+        return $result;
+	}
+
     public static function getActionUrl(): string
     {
         $uri = JUri::getInstance();

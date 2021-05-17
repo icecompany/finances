@@ -21,6 +21,7 @@ HTMLHelper::_('stylesheet', 'com_scores/style.css', array('version' => 'auto', '
             <table class="table table-striped" id="itemList">
                 <thead><?php echo $this->loadTemplate('head'); ?></thead>
                 <tbody><?php echo $this->loadTemplate('body'); ?></tbody>
+                <tbody><?php echo $this->loadTemplate('amount'); ?></tbody>
                 <tfoot><?php echo $this->loadTemplate('foot'); ?></tfoot>
             </table>
             <input type="hidden" name="task" value=""/>
