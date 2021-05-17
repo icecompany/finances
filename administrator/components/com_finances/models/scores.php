@@ -48,7 +48,7 @@ class FinancesModelScores extends ListModel
             ->rightJoin("#__mkv_contracts c on c.id = s.contractID")
             ->leftJoin("#__mkv_companies e on e.id = c.companyID")
             ->where("c.status in (1, 5, 10)")
-            ->group("s.contractID");
+            ->group("s.number, s.contractID");
         if (is_numeric($this->contractID)) {
             $query->where("s.contractID = {$this->_db->q($this->contractID)}");
         }
@@ -74,7 +74,12 @@ class FinancesModelScores extends ListModel
             // Фильтруем по состоянию оплаты.
             $status = $this->getState('filter.status');
             if (is_numeric($status)) {
-                $query->where("s.status = {$this->_db->q($status)}");
+                if ($status < 0) {
+                    $query->where("s.id is null");
+                }
+                else {
+                    $query->where("s.status = {$this->_db->q($status)}");
+                }
             }
             // Фильтруем по менеджеру.
             $manager = $this->getState('filter.manager');

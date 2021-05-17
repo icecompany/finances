@@ -15,6 +15,17 @@
 				>
 			<option value="">COM_MKV_FILTER_SELECT_MANAGER</option>
 		</field>
+		<field
+				name="status"
+				type="list"
+				onchange="this.form.submit();"
+				>
+			<option value="">COM_FINANCES_FILTER_SELECT_SCORE_STATUS</option>
+			<option value="-1">COM_MKV_PAYMENT_STATUS_</option>
+			<option value="0">COM_MKV_PAYMENT_STATUS_0</option>
+			<option value="1">COM_MKV_PAYMENT_STATUS_1</option>
+			<option value="2">COM_MKV_PAYMENT_STATUS_2</option>
+		</field>
 	</fields>
 	<fields name="list">
 		<field
