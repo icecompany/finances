@@ -48,7 +48,7 @@ class FinancesModelScores extends ListModel
             ->rightJoin("#__mkv_contracts c on c.id = s.contractID")
             ->leftJoin("#__mkv_companies e on e.id = c.companyID")
             ->where("c.status in (1, 5, 10)")
-            ->group("s.number, s.contractID");
+            ->group("s.number, s.contractID, c.companyID");
         if (is_numeric($this->contractID)) {
             $query->where("s.contractID = {$this->_db->q($this->contractID)}");
         }
