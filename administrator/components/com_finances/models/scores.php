@@ -15,6 +15,7 @@ class FinancesModelScores extends ListModel
                 'c.amount',
                 's.amount',
                 's.status',
+                'contract_status',
                 'status',
                 'manager',
                 'search',
@@ -90,6 +91,17 @@ class FinancesModelScores extends ListModel
             if (is_numeric($project)) {
                 $query->where("c.projectID = {$this->_db->q($project)}");
             }
+
+            $contract_status = $this->getState('filter.contract_status');
+            if (is_array($contract_status) && !empty($contract_status)) {
+                $contract_status = implode(", ", $contract_status);
+                if (in_array(101, $status)) {
+                    $query->where("(c.status in ({$contract_status}) or c.status is null)");
+                } else {
+                    $query->where("c.status in ({$contract_status})");
+                }
+            }
+
             /* Сортировка */
             $orderCol  = $this->state->get('list.ordering');
             $orderDirn = $this->state->get('list.direction');
@@ -167,6 +179,13 @@ class FinancesModelScores extends ListModel
         return $result;
     }
 
+    public function getFilterForm($data = array(), $loadData = true)
+    {
+        $form = parent::getFilterForm($data, $loadData);
+        $form::addFieldPath(JPATH_ADMINISTRATOR . "/components/com_contracts/models/fields");
+        return $form;
+    }
+
     public function getTitle(): string
     {
         if ($this->contractID > 0) {
@@ -194,6 +213,8 @@ class FinancesModelScores extends ListModel
     /* Сортировка по умолчанию */
     protected function populateState($ordering = 's.id', $direction = 'DESC')
     {
+        $contract_status = $this->getUserStateFromRequest($this->context . '.filter.contract_status', 'filter_contract_status');
+        $this->setState('filter.contract_status', $contract_status);
         $status = $this->getUserStateFromRequest($this->context . '.filter.status', 'filter_status', '', 'string');
         $this->setState('filter.status', $status);
         $manager = $this->getUserStateFromRequest($this->context . '.filter.manager', 'filter_manager');
@@ -204,6 +225,7 @@ class FinancesModelScores extends ListModel
 
     protected function getStoreId($id = '')
     {
+        $id .= ':' . $this->getState('filter.contract_status');
         $id .= ':' . $this->getState('filter.status');
         $id .= ':' . $this->getState('filter.manager');
         return parent::getStoreId($id);

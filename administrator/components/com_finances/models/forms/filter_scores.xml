@@ -16,6 +16,14 @@
 			<option value="">COM_MKV_FILTER_SELECT_MANAGER</option>
 		</field>
 		<field
+				name="contract_status"
+				type="ContractStatus"
+				multiple="true"
+				onchange="this.form.submit();"
+		>
+			<option value="101">COM_CONTRACTS_CONTRACT_STATUS_IN_PROJECT</option>
+		</field>
+		<field
 				name="status"
 				type="list"
 				onchange="this.form.submit();"
