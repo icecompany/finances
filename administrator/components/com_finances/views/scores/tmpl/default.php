@@ -8,6 +8,16 @@ use Joomla\CMS\HTML\HTMLHelper;
 
 HTMLHelper::_('stylesheet', 'com_scores/style.css', array('version' => 'auto', 'relative' => true));
 ?>
+<script>
+    Joomla.submitbutton = function (task) {
+        let form = document.querySelector('#adminForm');
+        if (task === 'scores.download') {
+            location.href = 'index.php?option=com_finances&task=scores.execute&format=xls';
+            return false;
+        }
+        else Joomla.submitform(task, form);
+    };
+</script>
 <div class="row-fluid">
     <div id="j-sidebar-container" class="span2">
         <form action="<?php echo PrjHelper::getSidebarAction(); ?>" method="post">

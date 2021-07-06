@@ -35,6 +35,19 @@ class FinancesModelScores extends ListModel
             $this->contractID = $config['contractID'];
             $this->raw = true;
         }
+        if ($config['raw']) $this->raw = true;
+        $this->heads = [
+            'number' => 'COM_MKV_HEAD_SCORE_NUMBER',
+            'dat' => 'COM_MKV_HEAD_SCORE_DATE',
+            'contract_number_clean' => 'COM_MKV_HEAD_CONTRACT_NUMBER',
+            'contract_date' => 'COM_MKV_HEAD_CONTRACT_DATE',
+            'company' => 'COM_MKV_HEAD_COMPANY',
+            'contract_amount_clean' => 'COM_MKV_HEAD_CONTRACT_AMOUNT',
+            'amount_clean' => 'COM_MKV_HEAD_PAYMENT_AMOUNT',
+            'payments_clean' => 'COM_MKV_HEAD_PAYED',
+            'debt_clean' => 'COM_MKV_HEAD_DEBT',
+            'status_clean' => 'COM_MKV_HEAD_STATUS',
+        ];
     }
 
     protected function _getListQuery()
@@ -105,7 +118,8 @@ class FinancesModelScores extends ListModel
             /* Сортировка */
             $orderCol  = $this->state->get('list.ordering');
             $orderDirn = $this->state->get('list.direction');
-            $limit = $this->getState('list.limit');
+            //Ограничение длины списка
+            $limit = (!$this->raw) ? $this->state->get('list.limit') : 0;
             if ($orderCol == 's.number') {
                 if ($orderDirn == 'ASC') $orderCol = "LENGTH(s.number) ASC, s.number";
                 if ($orderDirn == 'DESC') $orderCol = "LENGTH(s.number) DESC, s.number";
@@ -138,6 +152,7 @@ class FinancesModelScores extends ListModel
             $arr['number'] = $item->number;
             $arr['company'] = $item->company;
             $arr['contract'] = MkvHelper::getContractSmallTitle($item->contract_number ?? '', '');
+            $arr['contract_number_clean'] = $item->contract_number ?? '';
             $arr['dat'] = JDate::getInstance($item->dat)->format("d.m.Y");
             $arr['contract_date'] = JDate::getInstance($item->contract_date)->format("d.m.Y");
             $currency = mb_strtoupper($item->currency);
@@ -151,7 +166,7 @@ class FinancesModelScores extends ListModel
             $debt = number_format((float) $item->debt, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC);
             $arr['debt'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $debt);
             $arr['status_clean'] = JText::sprintf("COM_MKV_PAYMENT_STATUS_{$item->status}");
-            $contract_amount = (!is_null($item->contract_amount)) ? number_format((float) $item->contract_amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, MKV_FORMAT_SEPARATOR_DEC) : '';
+            $contract_amount = (!is_null($item->contract_amount)) ? number_format((float) $item->contract_amount, MKV_FORMAT_DEC_COUNT, MKV_FORMAT_SEPARATOR_FRACTION, (!$this->raw) ? MKV_FORMAT_SEPARATOR_DEC : '') : '';
             $arr['contract_amount_clean'] = $contract_amount;
             $arr['contract_amount'] = JText::sprintf("COM_MKV_AMOUNT_{$currency}_SHORT", $contract_amount);
             $arr['color'] = FinancesHelper::getPaymentStatusColor($item->status);
@@ -177,6 +192,52 @@ class FinancesModelScores extends ListModel
         $result['amount'] = FinancesHelper::getProjectScoresAmount();
         $result['contracts_amount'] = ContractsHelper::getProjectAmount();
         return $result;
+    }
+
+    public function export()
+    {
+        $items = $this->getItems();
+        JLoader::discover('PHPExcel', JPATH_LIBRARIES);
+        JLoader::register('PHPExcel', JPATH_LIBRARIES . '/PHPExcel.php');
+
+        $xls = new PHPExcel();
+        $xls->setActiveSheetIndex(0);
+        $sheet = $xls->getActiveSheet();
+
+        //Добавляем списки
+
+        //Заголовки
+        $j = 0;
+        foreach ($this->heads as $item => $head) $sheet->setCellValueByColumnAndRow($j++, 1, JText::sprintf($head));
+
+        $sheet->setTitle(JText::sprintf('COM_FINANCES_MENU_SCORES'));
+
+        //Данные
+        $row = 2; //Строка, с которой начнаются данные
+        $col = 0;
+        foreach ($items['items'] as $contractID => $item) {
+            foreach ($this->heads as $elem => $head) {
+                $float = ['amount_clean', 'payments_clean', 'debt_clean', 'contract_amount_clean'];
+                if (array_search($elem, $float) === false) {
+                    $sheet->setCellValueExplicitByColumnAndRow($col++, $row, $item[$elem], PHPExcel_Cell_DataType::TYPE_STRING);
+                }
+                else {
+                    $sheet->setCellValueByColumnAndRow($col++, $row, $item[$elem]);
+                    $sheet->getStyleByColumnAndRow($col-1, $row)->getNumberFormat()->setFormatCode('0');
+                }
+            }
+            $col = 0;
+            $row++;
+        }
+        header("Expires: Mon, 1 Apr 1974 05:00:00 GMT");
+        header("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT");
+        header("Cache-Control: no-cache, must-revalidate");
+        header("Pragma: public");
+        header("Content-type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=Scores.xls");
+        $objWriter = PHPExcel_IOFactory::createWriter($xls, 'Excel5');
+        $objWriter->save('php://output');
+        jexit();
     }
 
     public function getFilterForm($data = array(), $loadData = true)
@@ -231,5 +292,5 @@ class FinancesModelScores extends ListModel
         return parent::getStoreId($id);
     }
 
-    private $contractID, $raw;
+    private $contractID, $raw, $heads;
 }

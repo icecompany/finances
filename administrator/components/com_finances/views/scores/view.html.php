@@ -50,6 +50,7 @@ class FinancesViewScores extends HtmlView
         {
             JToolbarHelper::deleteList('COM_FINANCES_CONFIRM_REMOVE_SCORE', 'scores.delete');
         }
+        JToolbarHelper::custom('scores.download', 'download', 'download', JText::sprintf('COM_MKV_BUTTON_EXPORT_TO_EXCEL'), false);
 
         if (FinancesHelper::canDo('core.admin'))
         {
